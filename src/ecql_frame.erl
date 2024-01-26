@@ -464,7 +464,7 @@ serialize_parameter(values, [H |_] = Vals) when is_tuple(H) ->
     Bin = << <<(serialize_string(Name))/binary, (serialize_bytes(Val))/binary>> || {Name, Val} <- Vals >>,
     <<(length(Vals)):?short, Bin/binary>>;
 
-serialize_parameter(values, [H |_] = Vals) when is_binary(H) ->
+serialize_parameter(values, [H |_] = Vals) when is_binary(H) orelse H =:= null ->
     Bin = << <<(serialize_bytes(Val))/binary>> || Val <- Vals >>,
     <<(length(Vals)):?short, Bin/binary>>;
 
@@ -523,6 +523,7 @@ result_kind(16#05) -> schema_change.
 
 flag(values, undefined)                   -> 0;
 flag(values, [])                          -> 0;
+flag(values, [null|_])                    -> 0;
 flag(values, [Val|_]) when is_binary(Val) -> 0;
 flag(values, [Val|_]) when is_tuple(Val)  -> 1.
 
